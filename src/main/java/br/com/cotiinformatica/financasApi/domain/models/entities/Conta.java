@@ -3,7 +3,6 @@ package br.com.cotiinformatica.financasApi.domain.models.entities;
 import br.com.cotiinformatica.financasApi.domain.models.enums.Movimentacao;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ManyToAny;
 
 import java.math.BigDecimal;
 import java.util.Date;
