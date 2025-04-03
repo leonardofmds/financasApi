@@ -32,7 +32,7 @@ public class TipoController {
     }
 
     @GetMapping("consultar")
-    public List<TipoResponseDto> getAll(@PathVariable Integer id) throws Exception {
+    public List<TipoResponseDto> getAll() throws Exception {
         return tipoService.consultarTodos();
     }
     @GetMapping("obter/{id}")
