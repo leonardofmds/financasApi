@@ -5,6 +5,7 @@ import br.com.cotiinformatica.financasApi.domain.models.dtos.ContaResponseDto;
 import br.com.cotiinformatica.financasApi.domain.models.entities.Conta;
 import br.com.cotiinformatica.financasApi.domain.models.enums.Movimentacao;
 import br.com.cotiinformatica.financasApi.domain.services.interfaces.ContaService;
+import br.com.cotiinformatica.financasApi.infraestructure.components.RabbitMQProducerComponent;
 import br.com.cotiinformatica.financasApi.infraestructure.repositories.ContaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.List;
 public class ContaServiceImpl implements ContaService {
 
     @Autowired ContaRepository contaRepository;
+    @Autowired RabbitMQProducerComponent producerComponent;
 
     @Override
     public ContaResponseDto cadastrar(ContaRequestDto request) throws Exception {
@@ -34,6 +36,9 @@ public class ContaServiceImpl implements ContaService {
 
         //gravando a conta no banco de dados
         contaRepository.save(conta);
+
+        //enviando a conta para o servidor de mensageria
+        producerComponent.sendMessage(conta);
 
         return toResponse(conta);
     }
