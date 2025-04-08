@@ -5,6 +5,7 @@ import br.com.cotiinformatica.financasApi.domain.models.dtos.ContaResponseDto;
 import br.com.cotiinformatica.financasApi.domain.models.entities.Conta;
 import br.com.cotiinformatica.financasApi.domain.models.enums.Movimentacao;
 import br.com.cotiinformatica.financasApi.domain.services.interfaces.ContaService;
+import br.com.cotiinformatica.financasApi.infraestructure.components.LogFinancasComponent;
 import br.com.cotiinformatica.financasApi.infraestructure.components.RabbitMQProducerComponent;
 import br.com.cotiinformatica.financasApi.infraestructure.repositories.ContaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ public class ContaServiceImpl implements ContaService {
 
     @Autowired ContaRepository contaRepository;
     @Autowired RabbitMQProducerComponent producerComponent;
+    @Autowired LogFinancasComponent logFinancasComponent;
 
     @Override
     public ContaResponseDto cadastrar(ContaRequestDto request) throws Exception {
@@ -39,6 +41,9 @@ public class ContaServiceImpl implements ContaService {
 
         //enviando a conta para o servidor de mensageria
         producerComponent.sendMessage(conta);
+
+        //gerando o log de movimentação
+        logFinancasComponent.gerarLog(conta, LogFinancasComponent.Operacao.CADASTRO);
 
         return toResponse(conta);
     }
@@ -62,6 +67,9 @@ public class ContaServiceImpl implements ContaService {
 
         contaRepository.save(conta);
 
+        //gerando o log de movimentação
+        logFinancasComponent.gerarLog(conta, LogFinancasComponent.Operacao.ALTERACAO);
+
         return toResponse(conta);
     }
     @Override
@@ -73,6 +81,10 @@ public class ContaServiceImpl implements ContaService {
 
         var conta = registro.get();
         contaRepository.delete(conta);
+
+        //gerando o log de movimentação
+        logFinancasComponent.gerarLog(conta, LogFinancasComponent.Operacao.EXCLUSAO);
+
         return toResponse(conta);
     }
     @Override
