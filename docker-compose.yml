@@ -1,6 +1,17 @@
 services:
-
-
+  financasapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: financasapi_app
+    restart: always
+    ports:
+      - "8083:8083"
+    depends_on:
+      - postgres
+      - mongodb
+      - rabbitmq
+      - mailhog
   postgres:
     image: postgres:16
     container_name: financasapi_postgres
@@ -13,8 +24,6 @@ services:
       - "5439:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
-
   mongodb:
     image: mongo:7
     container_name: financasapi_mongodb
@@ -26,8 +35,6 @@ services:
       - "27018:27017"
     volumes:
       - mongo_data:/data/db
-
-
   rabbitmq:
     image: rabbitmq:3-management
     container_name: financasapi_rabbitmq
@@ -40,8 +47,6 @@ services:
       - "15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
-
-
   mailhog:
     image: mailhog/mailhog
     container_name: financasapi_mailhog
@@ -49,9 +54,10 @@ services:
     ports:
       - "1025:1025"   # Porta SMTP
       - "8025:8025"   # Interface web do MailHog
-
-
 volumes:
   postgres_data:
   mongo_data:
   rabbitmq_data:
+
+
+
